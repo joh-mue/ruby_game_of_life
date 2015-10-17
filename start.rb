@@ -1,16 +1,22 @@
 require 'active_support/core_ext/object/try.rb'
 require 'pry'
 
-X = 10
-Y = 10
+X = 20
+Y = 20
+REFRESH_RATE = 1
+GLIDER = [[0,1], [1,2], [2,0], [2,1], [2,2]]
 
 class GridInitializer
   def self.create_grid
     X.times.each_with_index.map do |_, i|
       Y.times.each_with_index.map do |_, j|
-        Cell.new(i, j)
+        Cell.new(i, j, self.is_alive(i, j))
       end
     end
+  end
+
+  def self.is_alive(x, y)
+    GLIDER.include?([x, y])
   end
 end
 
@@ -19,7 +25,7 @@ class Cell
   attr_reader :is_alive
 
   def initialize(x, y, is_alive)
-    @x, @y, @is_alive = x, y
+    @x, @y, @is_alive = x, y, is_alive
   end
 end
 
@@ -64,12 +70,11 @@ class NeighborFinder < Struct.new(:grid, :cell)
   end
 
   def left
-    grid[cell.x - 1].try(:[], cell.y1)
+    grid[cell.x - 1].try(:[], cell.y)
   end
 end
 
-class CellChanger < Struct.new(:cell)
-
+class CellChanger < Struct.new(:cell, :neighbors)
   def new_cell
     if cell.is_alive
       if alive_neighbor_count == 2 || alive_neighbor_count == 3
@@ -78,7 +83,7 @@ class CellChanger < Struct.new(:cell)
         dead_cell
       end
     else
-      if alive_neighbour_count == 3
+      if alive_neighbor_count == 3
         alive_cell
       else
         dead_cell
@@ -105,12 +110,37 @@ class GridChanger < Struct.new(:grid)
   def new_grid
     grid.map do |column|
       column.map do |cell|
-        CellChanger.new(cell).new_cell
+        neighbors = NeighborFinder.new(grid, cell).neighbors
+        CellChanger.new(cell, neighbors).new_cell
       end
     end
   end
 end
 
-grid = GridInitializer.create_grid
+class GridDrawer < Struct.new(:grid)
+  def draw
+    grid.each do |column|
+      column.each do |cell|
+        if cell.is_alive
+          print ' █'
+        else
+          print '  '
+        end
+      end
+      print "\n"
+    end
+    puts "--" * X
+  end
+end
 
-binding.pry
+class Runner < Struct.new(:grid)
+  def run
+    loop do
+      GridDrawer.new(grid).draw
+      @grid = GridChanger.new(grid).new_grid
+      sleep 1 / REFRESH_RATE
+    end
+  end
+end
+
+Runner.new(GridInitializer.create_grid).run
