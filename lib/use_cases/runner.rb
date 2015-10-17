@@ -9,7 +9,7 @@ class Runner
     loop do
       GridDrawer.new(grid).draw
       grid = GridChanger.new(grid).new_grid
-      sleep 1 / REFRESH_RATE
+      sleep 1.0 / REFRESH_RATE
     end
   end
 end

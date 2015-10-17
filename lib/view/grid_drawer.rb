@@ -1,6 +1,7 @@
 class GridDrawer < Struct.new(:grid)
   def draw
     grid.each do |column|
+      print '|'
       column.each do |cell|
         if cell.is_alive
           print ' █'
@@ -8,8 +9,8 @@ class GridDrawer < Struct.new(:grid)
           print '  '
         end
       end
-      print "\n"
+      print " |\n"
     end
-    puts "--" * X
+    puts '--' * ( X + 1 )
   end
 end
