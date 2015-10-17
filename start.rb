@@ -16,10 +16,10 @@ end
 
 class Cell
   attr_reader :x, :y
-  attr_accessor :is_alive
+  attr_reader :is_alive
 
-  def initialize(x, y)
-    @x, @y = x, y
+  def initialize(x, y, is_alive)
+    @x, @y, @is_alive = x, y
   end
 end
 
@@ -68,12 +68,20 @@ class NeighborFinder < Struct.new(:grid, :cell)
   end
 end
 
-class CellChanger < Struct.new(:cell, :new_cell)
+class CellChanger < Struct.new(:cell)
 
   def new_cell
     if cell.is_alive
-      if alive_neighbor_count < 2
-        Cell.new(cell.x, cell.y, )
+      if alive_neighbor_count == 2 || alive_neighbor_count == 3
+        alive_cell
+      else
+        dead_cell
+      end
+    else
+      if alive_neighbour_count == 3
+        alive_cell
+      else
+        dead_cell
       end
     end
   end
@@ -83,11 +91,26 @@ class CellChanger < Struct.new(:cell, :new_cell)
   def alive_neighbor_count
     neighbors.count(&:is_alive)
   end
-end
-grid_a = GridInitializer.create_grid
-grid_b = GridInitializer.create_grid
 
-current_grid = grid_a
-next_grid = grid_b
+  def dead_cell
+    Cell.new(cell.x, cell.y, false)
+  end
+
+  def alive_cell
+    Cell.new(cell.x, cell.y, true)
+  end
+end
+
+class GridChanger < Struct.new(:grid)
+  def new_grid
+    grid.map do |column|
+      column.map do |cell|
+        CellChanger.new(cell).new_cell
+      end
+    end
+  end
+end
+
+grid = GridInitializer.create_grid
 
 binding.pry
