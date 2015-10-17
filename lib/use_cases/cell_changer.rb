@@ -1,4 +1,4 @@
-require '../model/cell'
+require 'model/cell'
 
 class CellChanger < Struct.new(:cell, :neighbors)
   def new_cell

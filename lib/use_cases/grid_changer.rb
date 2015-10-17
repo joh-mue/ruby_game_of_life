@@ -1,5 +1,5 @@
-require 'neighbor_finder'
-require 'cell_changer'
+require 'use_cases/neighbor_finder'
+require 'use_cases/cell_changer'
 
 class GridChanger < Struct.new(:grid)
   def new_grid

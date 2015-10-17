@@ -1,5 +1,5 @@
-require '../model/cell'
-require '../config'
+require 'model/cell'
+require 'config'
 
 class GridInitializer
   def self.create_grid

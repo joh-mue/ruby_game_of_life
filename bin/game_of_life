@@ -1,3 +1,5 @@
 #!/usr/bin/env ruby
+$LOAD_PATH.unshift File.join File.expand_path(__FILE__), '..', '..', 'lib'
+require 'use_cases/runner'
 
-Runner.new(GridInitializer.create_grid).run
+Runner.run
