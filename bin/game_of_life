@@ -1,0 +1,3 @@
+#!/usr/bin/env ruby
+
+Runner.new(GridInitializer.create_grid).run
